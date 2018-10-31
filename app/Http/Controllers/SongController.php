@@ -4,9 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Song;
 use Illuminate\Http\Request;
+use \Firebase\JWT\JWT;
 
 class SongController extends Controller
 {
+    const USER = 0;
+    const PASSWORD = 1;
+
     /**
      * Display a listing of the resource.
      *
@@ -44,14 +48,29 @@ class SongController extends Controller
      * @param  \App\Song  $song
      * @return \Illuminate\Http\Response
      */
-    public function show(Song $song)
+    public function show()
     {
-        return response()->json([
-            'id' => $song->id,
-            'title' => $song->title,
-            'time' => $song->time
-        ]);
+        $headers = getallheaders();
+        $token = $headers['Authorization'];
 
+        $tokenDecoded = JWT::decode($token, '7kvP3yy3b4SGpVz6uSeSBhBEDtGzPb2n', array('HS256'));
+
+        //var_dump($tokenDecoded); exit;
+
+        $userDB = [
+            self::USER => 'pepin', 
+            self::PASSWORD => '1234'
+        ];
+
+        if ($userDB[self::USER] == $tokenDecoded->user and $userDB[self::PASSWORD] == $tokenDecoded->password)
+        {
+            return response()->json([
+                'id' => 1,
+                'title' => 'la macarena',
+                'time' => '4.3'
+            ]);
+
+        }
     }
 
     /**
